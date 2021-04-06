@@ -336,6 +336,7 @@ public class GanttProject extends GanttProjectBase implements ResourceView, Gant
       mHuman.add(a);
     }
     mHuman.add(myResourceActions.getResourceSendMailAction());
+    mHuman.add(myResourceActions.getResourceAddFromDifferentProjectAction());
     bar.add(mHuman);
 
     HelpMenu helpMenu = new HelpMenu(getProject(), getUIFacade(), getProjectUIFacade());
@@ -1086,6 +1087,13 @@ public class GanttProject extends GanttProjectBase implements ResourceView, Gant
 
   @Override
   protected ParserFactory getParserFactory() {
+    if (myParserFactory == null) {
+      myParserFactory = new ParserFactoryImpl();
+    }
+    return myParserFactory;
+  }
+
+  public ParserFactory getParser() {
     if (myParserFactory == null) {
       myParserFactory = new ParserFactoryImpl();
     }

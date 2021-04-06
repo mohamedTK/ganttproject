@@ -42,12 +42,15 @@ public class ResourceActionSet {
 
   private final AssignmentDeleteAction myAssignmentDelete;
 
+  private final ResourceAddFromDifferentProjectAction myResourceAddFromDifferentProjectAction;
+
   private AbstractAction[] myActions;
 
   public ResourceActionSet(ResourceContext resourceContext, AssignmentContext assignmentContext,
       GanttProject projectFrame, UIFacade uiFacade, ResourceTreeTable table) {
     HumanResourceManager manager = projectFrame.getHumanResourceManager();
     myResourceNewAction = new ResourceNewAction(manager, projectFrame.getRoleManager(), projectFrame.getTaskManager(), uiFacade);
+    myResourceAddFromDifferentProjectAction = new ResourceAddFromDifferentProjectAction(manager, projectFrame.getRoleManager(), projectFrame.getTaskManager(), projectFrame.getResourceCustomPropertyManager(), uiFacade, projectFrame.getParser());
     myResourceDeleteAction = new ResourceDeleteAction(manager, resourceContext, projectFrame, uiFacade);
     myResourcePropertiesAction = new ResourcePropertiesAction(projectFrame, resourceContext, uiFacade);
     myResourceMoveUpAction = new ResourceMoveUpAction(table);
@@ -59,6 +62,7 @@ public class ResourceActionSet {
   public AbstractAction[] getActions() {
     if (myActions == null) {
       myResourceNewAction.putValue(Action.SHORT_DESCRIPTION, null);
+      myResourceAddFromDifferentProjectAction.putValue(Action.SHORT_DESCRIPTION, null);
       myResourcePropertiesAction.putValue(Action.SHORT_DESCRIPTION, null);
       myResourceSendMailAction.putValue(Action.SHORT_DESCRIPTION, null);
       myActions = new AbstractAction[] { myResourceNewAction, myResourcePropertiesAction };
@@ -92,5 +96,9 @@ public class ResourceActionSet {
 
   public AssignmentDeleteAction getAssignmentDelete() {
     return myAssignmentDelete;
+  }
+
+  public ResourceAddFromDifferentProjectAction getResourceAddFromDifferentProjectAction() {
+    return myResourceAddFromDifferentProjectAction;
   }
 }
