@@ -18,19 +18,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 package net.sourceforge.ganttproject.gui.options;
 
-import java.awt.BorderLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.Box;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 import net.sourceforge.ganttproject.GanttProject;
 import net.sourceforge.ganttproject.IGanttProject;
@@ -54,6 +46,8 @@ public class ProjectSettingsPanel {
 
   private final JTextArea taDescr;
 
+  private final JCheckBox tfShare;
+
   private final IGanttProject myProject;
 
   private JPanel myComponent;
@@ -69,6 +63,11 @@ public class ProjectSettingsPanel {
     vbproject.add(namePanel);
     vbproject.add(tfName = new JTextField());
     vbproject.add(new JPanel());
+
+    JPanel shareablePanel = new JPanel(new GridLayout(0,2));
+    shareablePanel.add(new JLabel("Rendre le projet partageable"));
+    shareablePanel.add(tfShare = new JCheckBox());
+    vbproject.add(shareablePanel);
 
     JPanel orgaPanel = new JPanel(new BorderLayout());
     orgaPanel.add(new JLabel(language.getText("organization")), BorderLayout.WEST);
@@ -124,9 +123,11 @@ public class ProjectSettingsPanel {
       // apply changes if user clicked apply (or warn about pending changes and
       // ask whether to apply or not)
       myProject.setProjectName(getProjectName());
+      myProject.setProjectShareable(getShareable());
       myProject.setDescription(getProjectDescription());
       myProject.setOrganization(getProjectOrganization());
       myProject.setWebLink(getWebLink());
+
     }
     return hasChange;
   }
@@ -136,6 +137,7 @@ public class ProjectSettingsPanel {
     tfOrganization.setText(myProject.getOrganization());
     tfWebLink.setText(myProject.getWebLink());
     taDescr.setText(myProject.getDescription());
+    tfShare.setSelected(false);
   }
 
   /** @return the selected project name */
@@ -152,6 +154,11 @@ public class ProjectSettingsPanel {
   public String getWebLink() {
     return tfWebLink.getText();
   }
+
+  public boolean getShareable() {
+    return tfShare.isSelected();
+  }
+
 
   /** @return the project description */
   public String getProjectDescription() {

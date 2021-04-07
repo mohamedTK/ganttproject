@@ -27,6 +27,8 @@ public class PrjInfos {
   /** The name of the project */
   private String _sProjectName;
 
+  private boolean _sProjectShareable;
+
   /** A short description of it */
   private String _sDescription;
 
@@ -38,13 +40,15 @@ public class PrjInfos {
 
   public PrjInfos() {
     this._sProjectName = "Untitled Gantt Project";
+    this._sProjectShareable = false;
     this._sDescription = "";
     this._sOrganization = "";
     this._sWebLink = "http://";
   }
 
-  public PrjInfos(String sProjectName, String sDescription, String sOrganization, String sWebLink) {
+  public PrjInfos(String sProjectName, boolean sProjectShareable, String sDescription, String sOrganization, String sWebLink) {
     this._sProjectName = sProjectName;
+    this._sProjectShareable = sProjectShareable;
     this._sDescription = sDescription;
     this._sOrganization = sOrganization;
     this._sWebLink = sWebLink;
@@ -55,9 +59,16 @@ public class PrjInfos {
     return _sProjectName;
   }
 
+
   /** sets the name of the project. */
   public void setName(String projectName) {
     _sProjectName = projectName;
+  }
+
+  public boolean getShareable() {return _sProjectShareable;}
+
+  public void setShareable(boolean projectShareable) {
+    _sProjectShareable = projectShareable;
   }
 
   /** @return the description of the project. */

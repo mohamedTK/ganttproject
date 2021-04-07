@@ -81,6 +81,8 @@ public class GanttOptions extends SaverBase {
 
   private boolean isloaded;
 
+  private boolean isShareable;
+
   private boolean automatic;
 
   private boolean redline;

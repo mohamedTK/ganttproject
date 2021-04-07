@@ -44,6 +44,10 @@ public interface IGanttProject {
 
   void setProjectName(String projectName);
 
+  boolean getProjectShareable();
+
+  void setProjectShareable(boolean projectShareable);
+
   String getDescription();
 
   void setDescription(String description);

@@ -72,6 +72,7 @@ public class GanttXMLSaver extends SaverBase implements GPSaver {
       addAttribute("name", getProject().getProjectName(), attrs);
       addAttribute("company", getProject().getOrganization(), attrs);
       addAttribute("webLink", getProject().getWebLink(), attrs);
+      addAttribute("shareable", getProject().getProjectShareable(), attrs);
       if (area != null) {
         addAttribute("view-date", CalendarFactory.createGanttCalendar(area.getStartDate()).toXMLString(), attrs);
       }
