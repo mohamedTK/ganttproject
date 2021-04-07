@@ -49,6 +49,7 @@ import java.util.List;
 public class GanttProjectImpl implements IGanttProject {
   private static final GanttLanguage language = GanttLanguage.getInstance();
   private String myProjectName;
+  private boolean myProjectShareable;
   private String myDescription;
   private String myOrganization;
   private String myWebLink;
@@ -81,6 +82,17 @@ public class GanttProjectImpl implements IGanttProject {
   public String getProjectName() {
     return myProjectName;
   }
+
+  @Override
+  public boolean getProjectShareable() {
+    return myProjectShareable;
+  }
+
+  @Override
+  public void setProjectShareable(boolean projectShareable) {
+    myProjectShareable = projectShareable;
+  }
+
 
   @Override
   public void setProjectName(String projectName) {

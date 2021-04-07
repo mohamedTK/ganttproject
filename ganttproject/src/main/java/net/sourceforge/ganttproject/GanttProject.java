@@ -970,8 +970,20 @@ public class GanttProject extends GanttProjectBase implements ResourceView, Gant
   }
 
   @Override
+  public boolean getProjectShareable() {
+    return prjInfos.getShareable();
+  }
+
+
+  @Override
   public void setProjectName(String projectName) {
     prjInfos.setName(projectName);
+    setAskForSave(true);
+  }
+
+  @Override
+  public void setProjectShareable(boolean projectShareable) {
+    prjInfos.setShareable(projectShareable);
     setAskForSave(true);
   }
 
