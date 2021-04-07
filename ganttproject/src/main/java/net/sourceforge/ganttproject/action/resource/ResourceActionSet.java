@@ -50,7 +50,7 @@ public class ResourceActionSet {
       GanttProject projectFrame, UIFacade uiFacade, ResourceTreeTable table) {
     HumanResourceManager manager = projectFrame.getHumanResourceManager();
     myResourceNewAction = new ResourceNewAction(manager, projectFrame.getRoleManager(), projectFrame.getTaskManager(), uiFacade);
-    myResourceAddFromDifferentProjectAction = new ResourceAddFromDifferentProjectAction(manager, projectFrame.getRoleManager(), projectFrame.getTaskManager(), projectFrame.getResourceCustomPropertyManager(), uiFacade, projectFrame.getParser(), projectFrame.isShareable());
+    myResourceAddFromDifferentProjectAction = new ResourceAddFromDifferentProjectAction(manager, projectFrame.getRoleManager(), projectFrame.getTaskManager(), projectFrame.getResourceCustomPropertyManager(), uiFacade, projectFrame.getParser(), projectFrame.getProjectShareable());
     myResourceDeleteAction = new ResourceDeleteAction(manager, resourceContext, projectFrame, uiFacade);
     myResourcePropertiesAction = new ResourcePropertiesAction(projectFrame, resourceContext, uiFacade);
     myResourceMoveUpAction = new ResourceMoveUpAction(table);
