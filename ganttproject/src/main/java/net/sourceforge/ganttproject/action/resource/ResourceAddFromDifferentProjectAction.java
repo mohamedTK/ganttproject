@@ -27,10 +27,13 @@ import net.sourceforge.ganttproject.language.GanttLanguage;
 import net.sourceforge.ganttproject.parser.GPParser;
 import net.sourceforge.ganttproject.parser.ParserFactory;
 import net.sourceforge.ganttproject.parser.ResourceTagHandler;
+import net.sourceforge.ganttproject.parser.RoleTagHandler;
 import net.sourceforge.ganttproject.resource.HumanResourceManager;
 import net.sourceforge.ganttproject.roles.RoleManager;
 import net.sourceforge.ganttproject.task.TaskManager;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -39,6 +42,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileInputStream;
@@ -55,28 +59,31 @@ public class ResourceAddFromDifferentProjectAction extends ResourceAction {
   private final TaskManager myTaskManager;
   private final CustomPropertyManager myCustomPropertyManager;
   private final ParserFactory myParserFactory;
+  private final boolean myIsProjectShareable;
 
-  public ResourceAddFromDifferentProjectAction(HumanResourceManager hrManager, RoleManager roleManager, TaskManager taskManager, CustomPropertyManager customPropertyManager, UIFacade uiFacade, ParserFactory parserFactory) {
+  public ResourceAddFromDifferentProjectAction(HumanResourceManager hrManager, RoleManager roleManager, TaskManager taskManager, CustomPropertyManager customPropertyManager, UIFacade uiFacade, ParserFactory parserFactory, boolean isShareable) {
     super("resource.importresourcefromproject", hrManager);
     myUIFacade = uiFacade;
     myRoleManager = roleManager;
     myTaskManager = taskManager;
     myCustomPropertyManager = customPropertyManager;
     myParserFactory = parserFactory;
+    myIsProjectShareable = isShareable;
   }
 
-  private ResourceAddFromDifferentProjectAction(HumanResourceManager hrManager, RoleManager roleManager, TaskManager taskManager, CustomPropertyManager customPropertyManager, UIFacade uiFacade, IconSize size, ParserFactory parserFactory) {
+  ResourceAddFromDifferentProjectAction(HumanResourceManager hrManager, RoleManager roleManager, TaskManager taskManager, CustomPropertyManager customPropertyManager, UIFacade uiFacade, IconSize size, ParserFactory parserFactory, boolean isShareable) {
     super("resource.importresourcefromproject", hrManager, null, size);
     myUIFacade = uiFacade;
     myRoleManager = roleManager;
     myTaskManager = taskManager;
     myCustomPropertyManager = customPropertyManager;
     myParserFactory = parserFactory;
+    myIsProjectShareable = isShareable;
   }
 
   @Override
   public GPAction withIcon(IconSize size) {
-    return new ResourceAddFromDifferentProjectAction(getManager(), myRoleManager, myTaskManager, myCustomPropertyManager, myUIFacade, size, myParserFactory);
+    return new ResourceAddFromDifferentProjectAction(getManager(), myRoleManager, myTaskManager, myCustomPropertyManager, myUIFacade, size, myParserFactory, myIsProjectShareable);
   }
 
   @Override
@@ -103,52 +110,49 @@ public class ResourceAddFromDifferentProjectAction extends ResourceAction {
         e.printStackTrace();
       } catch (net.sourceforge.ganttproject.document.Document.DocumentException e) {
         e.printStackTrace();
+      } catch (XPathExpressionException e) {
+        e.printStackTrace();
       }
     }
-
-    //    final HumanResource resource = getManager().newHumanResource();
-    //    resource.setRole(myRoleManager.getDefaultRole());
-    //    GanttDialogPerson dp = new GanttDialogPerson(getManager().getCustomPropertyManager(), myTaskManager, myUIFacade, resource);
-    //    dp.setVisible(true);
-    //    if (dp.result()) {
-    //      myUIFacade.getUndoManager().undoableEdit(getLocalizedDescription(), new Runnable() {
-    //        @Override
-    //        public void run() {
-    //          getManager().add(resource);
-    //          myUIFacade.getResourceTree().setSelected(resource, true);
-    //        }
-    //      });
-    //    }
   }
 
-  private void parse(String filename) throws ParserConfigurationException, IOException, SAXException, net.sourceforge.ganttproject.document.Document.DocumentException {
-    //    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    //    factory.setValidating(true);
-    //    factory.setIgnoringElementContentWhitespace(true);
-    //    DocumentBuilder builder = factory.newDocumentBuilder();
-    //    File file = new File(filename);
-    //    Document doc = builder.parse(file);
-    //
-    //    NodeList resources = doc.getElementsByTagName("resources");
-    //
-    //    System.out.println(resources.toString());
-    // Do something with the document here.
+  private void parse(String filename) throws ParserConfigurationException, IOException, SAXException, net.sourceforge.ganttproject.document.Document.DocumentException, XPathExpressionException {
+    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    factory.setValidating(true);
+    factory.setIgnoringElementContentWhitespace(true);
+    DocumentBuilder builder = factory.newDocumentBuilder();
+    File file = new File(filename);
+    Document doc = builder.parse(file);
 
-    GPParser opener = myParserFactory.newParser();
+    // Get root node and get attributes from it
+    Element project = doc.getDocumentElement();
 
-    ResourceTagHandler resourceHandler = new ResourceTagHandler(getManager(), myRoleManager,
-      myCustomPropertyManager);
+    if (project != null && Boolean.parseBoolean(project.getAttribute("shareable"))) {
+      // Project is shareable
+      GPParser opener = myParserFactory.newParser();
 
-    opener.addTagHandler(resourceHandler);
+      ResourceTagHandler resourceHandler = new ResourceTagHandler(getManager(), myRoleManager,
+        myCustomPropertyManager);
 
-    InputStream is;
-    try {
-      is = new FileInputStream(filename);
-    } catch (IOException e) {
-      throw new net.sourceforge.ganttproject.document.Document.DocumentException(GanttLanguage.getInstance().getText("msg8") + ": " + e.getLocalizedMessage(), e);
+      RoleTagHandler rolesHandler = new RoleTagHandler(myRoleManager);
+
+      opener.addTagHandler(resourceHandler);
+      opener.addTagHandler(rolesHandler);
+
+      InputStream is;
+      try {
+        is = new FileInputStream(filename);
+      } catch (IOException e) {
+        throw new net.sourceforge.ganttproject.document.Document.DocumentException(GanttLanguage.getInstance().getText("msg8") + ": " + e.getLocalizedMessage(), e);
+      }
+
+      opener.load(is);
+    } else {
+      JOptionPane.showMessageDialog(null,
+        String.format("Project %s is not shareable", filename),
+        "Project is not shareable",
+        JOptionPane.ERROR_MESSAGE);
     }
-
-    opener.load(is);
   }
 
   @Override
@@ -158,7 +162,7 @@ public class ResourceAddFromDifferentProjectAction extends ResourceAction {
 
   @Override
   public ResourceAddFromDifferentProjectAction asToolbarAction() {
-    ResourceAddFromDifferentProjectAction result = new ResourceAddFromDifferentProjectAction(getManager(), myRoleManager, myTaskManager, myCustomPropertyManager, myUIFacade, myParserFactory);
+    ResourceAddFromDifferentProjectAction result = new ResourceAddFromDifferentProjectAction(getManager(), myRoleManager, myTaskManager, myCustomPropertyManager, myUIFacade, myParserFactory, myIsProjectShareable);
     result.setFontAwesomeLabel(UIUtil.getFontawesomeLabel(result));
     return result;
   }
