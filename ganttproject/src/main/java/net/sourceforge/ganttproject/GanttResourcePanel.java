@@ -89,13 +89,16 @@ public class GanttResourcePanel extends TreeTableContainer<HumanResource, Resour
         return resourceDeleteAction;
       }
     }, new Action[]{resourceDeleteAction, assignmentDeleteAction});
+
     setArtefactActions(myResourceActionSet.getResourceNewAction(),
         myResourceActionSet.getResourcePropertiesAction(),
         deleteAction);
+
     getTreeTable().setupActionMaps(myResourceActionSet.getResourceMoveUpAction(),
         myResourceActionSet.getResourceMoveDownAction(), myResourceActionSet.getResourceNewAction(), deleteAction,
         appli.getCutAction(), appli.getCopyAction(), appli.getPasteAction(),
         myResourceActionSet.getResourcePropertiesAction());
+
     getTreeTable().addActionWithAccelleratorKey(myResourceActionSet.getAssignmentDelete());
     getTreeTable().setRowHeight(20);
 
@@ -111,6 +114,7 @@ public class GanttResourcePanel extends TreeTableContainer<HumanResource, Resour
         return getTreeTable().getRowHeight();
       }
     };
+
     prj.getZoomManager().addZoomListener(area.getZoomListener());
     area.getChartModel().setRowHeight(getTreeTable().getRowHeight());
 
@@ -211,6 +215,7 @@ public class GanttResourcePanel extends TreeTableContainer<HumanResource, Resour
       menu.add(appli.getCopyAction());
       menu.add(appli.getPasteAction());
       menu.add(myResourceActionSet.getResourceDeleteAction());
+      menu.add(myResourceActionSet.getResourceAddFromDifferentProjectAction());
     }
     menu.applyComponentOrientation(GanttLanguage.getInstance().getComponentOrientation());
     Point popupPoint = getPopupMenuPoint(e);
